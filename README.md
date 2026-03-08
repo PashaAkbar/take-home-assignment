@@ -1,32 +1,77 @@
 # Fullstack Boilerplate Project
 
-Repository ini berisi aplikasi **Fullstack** yang terdiri dari:
+Repository ini berisi aplikasi **Fullstack** yang terdiri dari dua bagian utama:
 
-* **Backend** → Golang REST API
-* **Frontend** → React Application
+* **Backend** → REST API menggunakan **Golang**
+* **Frontend** → Web application menggunakan **React**
 
-Kedua aplikasi berada dalam **satu repository** tetapi berjalan sebagai **dua service terpisah**.
+Kedua aplikasi berada dalam **satu repository** namun berjalan sebagai **service terpisah**.
 
 ---
 
 # Project Structure
 
 ```
-fullstack-project/
+take-home-assignment/
 │
-├── backend/        # Golang REST API
-│   ├── internal/
-│   ├── script/
-│   ├── Makefile
-│   ├── go.mod
-│   └── main.go
+├── backend/ # Golang REST API
+│ ├── internal/
+│ │ ├── api/ # API handler layer
+│ │ ├── config/ # Application configuration
+│ │ ├── entity/ # Domain entities
+│ │ ├── module/ # Business modules
+│ │ │ ├── auth/
+│ │ │ │ ├── handler/
+│ │ │ │ ├── repository/
+│ │ │ │ └── usecase/
+│ │ │ └── payment/
+│ │ │ ├── handler/
+│ │ │ ├── repository/
+│ │ │ └── usecase/
+│ │ │
+│ │ ├── openapigen/ # Generated OpenAPI server code
+│ │ ├── service/ # HTTP server setup
+│ │ └── transport/ # Transport utilities
+│ │
+│ ├── script/ # Utility scripts
+│ │ └── gen-secret/ # JWT secret generator
+│ │
+│ ├── vendor/ # Go dependencies
+│ ├── .env # Environment variables
+│ ├── env.sample # Example environment file
+│ ├── dashboard.db # SQLite database
+│ ├── go.mod
+│ ├── go.sum
+│ ├── main.go
+│ ├── Makefile
+│ └── README.md
 │
-├── frontend/       # React + Vite application
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── vite.config.ts
+├── frontend/ # React + Vite frontend
+│ ├── public/ # Static assets
+│ ├── src/
+│ │ ├── app/ # App initialization
+│ │ ├── assets/ # Images and static resources
+│ │ ├── components/ # Reusable UI components
+│ │ ├── features/ # Redux features / slices
+│ │ ├── lib/ # Utility libraries
+│ │ ├── pages/ # Page components
+│ │ ├── router/ # Application routing
+│ │ ├── schemas/ # Zod validation schemas
+│ │ ├── services/ # API service layer
+│ │ ├── test/ # Frontend unit tests
+│ │ ├── App.tsx
+│ │ ├── App.css
+│ │ ├── index.css
+│ │
+│ ├── package.json
+│ ├── package-lock.json
+│ ├── vite.config.ts
+│ ├── tsconfig.json
+│ ├── tsconfig.app.json
+│ ├── tsconfig.node.json
+│ └── README.md
 │
+├── openapi.yaml # OpenAPI specification
 └── README.md
 ```
 
@@ -38,9 +83,9 @@ fullstack-project/
 
 * Golang
 * Chi Router
-* OpenAPI (oapi-codegen)
-* Makefile
+* OpenAPI (`oapi-codegen`)
 * JWT Authentication
+* Makefile
 
 ## Frontend
 
@@ -50,17 +95,18 @@ fullstack-project/
 * React Hook Form
 * Zod
 * TailwindCSS
-* Vitest + React Testing Library
+* Vitest
+* React Testing Library
 
 ---
 
 # Requirements
 
-Pastikan sudah terinstall:
+Pastikan environment memiliki:
 
-* **Go** ≥ 1.21
-* **Node.js** ≥ 18
-* **npm** / **pnpm**
+* **Go ≥ 1.21**
+* **Node.js ≥ 20**
+* **npm**
 * **Make**
 
 Cek instalasi:
@@ -78,7 +124,7 @@ make -v
 
 ```
 git clone https://github.com/PashaAkbar/take-home-assignment.git
-cd fullstack-project
+cd take-home-assignment
 ```
 
 ---
@@ -121,23 +167,33 @@ Backend akan berjalan di:
 http://localhost:8080
 ```
 
-Swagger UI:
+---
+
+# API Documentation (Swagger)
+
+Swagger UI tersedia di:
 
 ```
-http://localhost:8080/swagger
+http://localhost:8080/swagger/index.html
+```
+
+OpenAPI JSON spec:
+
+```
+http://localhost:8080/swagger/doc.json
 ```
 
 ---
 
 # Backend Makefile Commands
 
-```
-make dep           install dependencies
-make openapi-gen   generate openapi server code
-make gen-secret    generate JWT secret
-make run           run application locally
-make build         build binary
-```
+| Command            | Description                  |
+| ------------------ | ---------------------------- |
+| `make dep`         | install Go dependencies      |
+| `make openapi-gen` | generate OpenAPI server code |
+| `make gen-secret`  | generate JWT secret          |
+| `make run`         | run backend locally          |
+| `make build`       | build binary                 |
 
 Build binary:
 
@@ -183,63 +239,113 @@ http://localhost:5173
 
 # Features
 
-### Authentication
+## Authentication
 
-* Login user
+* User login
 * JWT authentication
-* Form validation menggunakan Zod
+* Password validation menggunakan **bcrypt**
+* Form validation menggunakan **Zod**
 
-### Payments
+## Payments
 
-* Fetch payments dari backend API
-* Dashboard payments
-* Integration dengan Redux store
+* Fetch list of payments
+* Filter payments berdasarkan status
+* Dashboard UI menampilkan payments
 
-### API Documentation
+## API Documentation
 
 Backend menyediakan dokumentasi API menggunakan **Swagger UI**.
 
+Endpoint utama:
+
 ```
-http://localhost:8080/swagger
+GET /dashboard/v1/payments
+POST /dashboard/v1/auth/login
+```
+
+Swagger UI:
+
+```
+http://localhost:8080/swagger/index.html
 ```
 
 ---
 
 # Testing
 
-Frontend menggunakan:
+## Backend Unit Test
+
+Backend menggunakan **Go built-in testing**.
+
+Jalankan semua unit test:
 
 ```
+cd backend
+go test ./... -v
+```
+
+Contoh package yang memiliki unit test:
+
+```
+internal/module/auth/usecase
+internal/module/payment/usecase
+```
+
+Untuk melihat **test coverage**:
+
+```
+go test ./... -cover
+```
+
+---
+
+## Frontend Test
+
+Frontend menggunakan **Vitest** dan **React Testing Library**.
+
+Menjalankan unit test:
+
+```
+cd frontend
 npm run test
 ```
-
-Tools:
-
-* Vitest
-* React Testing Library
 
 ---
 
 # Development Flow
 
-Jalankan backend terlebih dahulu:
+1️⃣ Jalankan backend terlebih dahulu
 
 ```
 cd backend
 make run
 ```
 
-Lalu jalankan frontend:
+2️⃣ Jalankan frontend
 
 ```
 cd frontend
 npm run dev
 ```
 
-Frontend akan mengakses API di:
+3️⃣ Akses aplikasi
+
+Frontend:
+
+```
+http://localhost:5173
+```
+
+Backend API:
 
 ```
 http://localhost:8080
+```
+
+Swagger UI:
+
+```
+http://localhost:8080/swagger/index.html
 ```
 
 ---
