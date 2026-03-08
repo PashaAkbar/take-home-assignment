@@ -2,14 +2,17 @@ package usecase
 
 import (
 	"github.com/durianpay/fullstack-boilerplate/internal/module/payment/entity"
-	"github.com/durianpay/fullstack-boilerplate/internal/module/payment/repository"
 )
 
-type PaymentUsecase struct {
-	repo *repository.PaymentRepository
+type PaymentRepository interface {
+	List(status *string) ([]entity.Payment, error)
 }
 
-func NewPaymentUsecase(repo *repository.PaymentRepository) *PaymentUsecase {
+type PaymentUsecase struct {
+	repo PaymentRepository
+}
+
+func NewPaymentUsecase(repo PaymentRepository) *PaymentUsecase {
 	return &PaymentUsecase{repo: repo}
 }
 
