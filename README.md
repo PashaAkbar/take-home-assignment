@@ -14,64 +14,61 @@ Kedua aplikasi berada dalam **satu repository** namun berjalan sebagai **service
 ```
 take-home-assignment/
 │
-├── backend/ # Golang REST API
-│ ├── internal/
-│ │ ├── api/ # API handler layer
-│ │ ├── config/ # Application configuration
-│ │ ├── entity/ # Domain entities
-│ │ ├── module/ # Business modules
-│ │ │ ├── auth/
-│ │ │ │ ├── handler/
-│ │ │ │ ├── repository/
-│ │ │ │ └── usecase/
-│ │ │ └── payment/
-│ │ │ ├── handler/
-│ │ │ ├── repository/
-│ │ │ └── usecase/
-│ │ │
-│ │ ├── openapigen/ # Generated OpenAPI server code
-│ │ ├── service/ # HTTP server setup
-│ │ └── transport/ # Transport utilities
-│ │
-│ ├── script/ # Utility scripts
-│ │ └── gen-secret/ # JWT secret generator
-│ │
-│ ├── vendor/ # Go dependencies
-│ ├── .env # Environment variables
-│ ├── env.sample # Example environment file
-│ ├── dashboard.db # SQLite database
-│ ├── go.mod
-│ ├── go.sum
-│ ├── main.go
-│ ├── Makefile
-│ └── README.md
+├── backend/                     # Golang REST API
+│   ├── internal/
+│   │   ├── api/                 # API handler layer
+│   │   ├── config/              # Application configuration
+│   │   ├── entity/              # Domain entities
+│   │   ├── module/              # Business modules
+│   │   │   ├── auth/
+│   │   │   │   ├── handler/
+│   │   │   │   ├── repository/
+│   │   │   │   └── usecase/
+│   │   │   └── payment/
+│   │   │       ├── handler/
+│   │   │       ├── repository/
+│   │   │       └── usecase/
+│   │   │
+│   │   ├── openapigen/          # Generated OpenAPI server code
+│   │   ├── service/             # HTTP server setup
+│   │   └── transport/           # Transport utilities
+│   │
+│   ├── script/                  # Utility scripts
+│   │   └── gen-secret/          # JWT secret generator
+│   │
+│   ├── vendor/
+│   ├── .env
+│   ├── env.sample
+│   ├── dashboard.db             # SQLite database (seed data)
+│   ├── go.mod
+│   ├── go.sum
+│   ├── main.go
+│   ├── Makefile
+│   └── README.md
 │
-├── frontend/ # React + Vite frontend
-│ ├── public/ # Static assets
-│ ├── src/
-│ │ ├── app/ # App initialization
-│ │ ├── assets/ # Images and static resources
-│ │ ├── components/ # Reusable UI components
-│ │ ├── features/ # Redux features / slices
-│ │ ├── lib/ # Utility libraries
-│ │ ├── pages/ # Page components
-│ │ ├── router/ # Application routing
-│ │ ├── schemas/ # Zod validation schemas
-│ │ ├── services/ # API service layer
-│ │ ├── test/ # Frontend unit tests
-│ │ ├── App.tsx
-│ │ ├── App.css
-│ │ ├── index.css
-│ │
-│ ├── package.json
-│ ├── package-lock.json
-│ ├── vite.config.ts
-│ ├── tsconfig.json
-│ ├── tsconfig.app.json
-│ ├── tsconfig.node.json
-│ └── README.md
+├── frontend/                    # React + Vite frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── features/
+│   │   ├── lib/
+│   │   ├── pages/
+│   │   ├── router/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── test/
+│   │   ├── App.tsx
+│   │   ├── App.css
+│   │   └── index.css
+│   │
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── tsconfig.json
+│   └── README.md
 │
-├── openapi.yaml # OpenAPI specification
+├── openapi.yaml
 └── README.md
 ```
 
@@ -85,6 +82,7 @@ take-home-assignment/
 * Chi Router
 * OpenAPI (`oapi-codegen`)
 * JWT Authentication
+* SQLite
 * Makefile
 
 ## Frontend
@@ -185,6 +183,63 @@ http://localhost:8080/swagger/doc.json
 
 ---
 
+# Database Seed
+
+Project ini menggunakan **SQLite** sebagai database persistence.
+
+Database sudah disediakan dalam file:
+
+```
+backend/dashboard.db
+```
+
+File ini sudah berisi **sample data payments** sehingga aplikasi dapat langsung dijalankan tanpa perlu migration tambahan.
+
+Contoh data pembayaran yang tersedia:
+
+| Payment ID | Merchant   | Amount | Status     |
+| ---------- | ---------- | ------ | ---------- |
+| 1          | Merchant A | 10000  | completed  |
+| 2          | Merchant B | 5000   | processing |
+| 3          | Merchant C | 8000   | failed     |
+
+Status pembayaran yang tersedia:
+
+```
+completed
+processing
+failed
+```
+
+Data ini akan otomatis terbaca ketika backend dijalankan.
+
+---
+
+# Test Credentials
+
+Gunakan akun berikut untuk login ke dashboard:
+
+Email:
+
+```
+cs@durianpay.id
+```
+
+Password:
+
+```
+password
+```
+
+Role yang tersedia:
+
+```
+cs
+operation
+```
+
+---
+
 # Backend Makefile Commands
 
 | Command            | Description                  |
@@ -254,8 +309,6 @@ http://localhost:5173
 
 ## API Documentation
 
-Backend menyediakan dokumentasi API menggunakan **Swagger UI**.
-
 Endpoint utama:
 
 ```
@@ -277,21 +330,21 @@ http://localhost:8080/swagger/index.html
 
 Backend menggunakan **Go built-in testing**.
 
-Jalankan semua unit test:
+Menjalankan semua unit test:
 
 ```
 cd backend
 go test ./... -v
 ```
 
-Contoh package yang memiliki unit test:
+Package yang memiliki unit test:
 
 ```
 internal/module/auth/usecase
 internal/module/payment/usecase
 ```
 
-Untuk melihat **test coverage**:
+Melihat test coverage:
 
 ```
 go test ./... -cover
@@ -350,6 +403,3 @@ http://localhost:8080/swagger/index.html
 
 ---
 
-# License
-
-MIT License
