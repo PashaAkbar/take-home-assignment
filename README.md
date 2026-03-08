@@ -77,7 +77,7 @@ make -v
 # Clone Repository
 
 ```
-git clone https://github.com/your-username/fullstack-project.git
+git clone https://github.com/PashaAkbar/take-home-assignment.git
 cd fullstack-project
 ```
 
